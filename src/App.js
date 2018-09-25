@@ -146,6 +146,10 @@ class App extends Component {
       .domain([0, d3.max(dataset, (d) => { return d[1] })])
       .range([2, 20])
 
+    var aScale = d3.scaleSqrt() // example usage of sqrt scale for area of rendered circles
+                  .domain([0, d3.max(dataset, (d) => { return d[1] })])
+                  .range([0, 10]);
+
     var svg = d3.select("body")
       .append("svg")
       .attr("width", w)
@@ -157,7 +161,7 @@ class App extends Component {
       .append("circle")
       .attr("cx", (d) => { return xScale(d[0]) })
       .attr("cy", (d) => { return yScale(d[1]) })
-      .attr("r", (d) => { return rScale(d[1]) }); // scaling the circle size by area. 
+      .attr("r", (d) => { return aScale(d[1]) }); // scaling the circle size by area. 
 
     svg.selectAll("text")
       .data(dataset)
@@ -190,6 +194,13 @@ class App extends Component {
     ever, forces all output values to be within the specified range.This means exces‐
     sive values will be rounded to the range’s low or high value(whichever is
     nearest).
+  
+    Example Usage:
+    var scale = d3.scaleLinear()
+                .domain([0.123, 4.567])
+                .range([0, 500])
+                .nice();
+
   `
 
   }
