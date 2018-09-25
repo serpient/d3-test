@@ -45,7 +45,9 @@ class App extends Component {
     var dataset = [5, 10, 15, 20, 25];
 
     var circles = svg.selectAll("circle")
-                    .data(dataset)
+
+    
+    .data(dataset)
                     .enter()
                     .append("circle");
     circles.attr("cx", (d, i) => { return (i * 100) + 25})
@@ -97,6 +99,7 @@ class App extends Component {
       [5, 20], [480, 90], [250, 50], [100, 33], [330, 95],
       [410, 12], [475, 44], [25, 67], [85, 21], [220, 88]
     ];
+    
     var svg = d3.select("body")
                 .append("svg")
                 .attr("width", w)
@@ -121,10 +124,52 @@ class App extends Component {
         .attr("font-size", "11px")
         .attr("fill", "red")
   }
+  makeScatterPlotWithScales = () => {
+    let w = 500; // SVG width
+    let h = 200; // SVH height
+
+    var dataset = [
+      [5, 20], [480, 90], [250, 50], [100, 33], [330, 95],
+      [410, 12], [475, 44], [25, 67], [85, 21], [220, 88]
+    ];
+    
+    var xScale = d3.scaleLinear()
+                .domain([0, d3.max(dataset, (d) => { return d[0] })]) // input
+                .range([w, 0]); // outputs
+
+    var yScale = d3.scaleLinear()
+                    .domain([0, d3.max(dataset, (d) => { return d[1] })])
+                    .range([h, 0])
+
+    var svg = d3.select("body")
+      .append("svg")
+      .attr("width", w)
+      .attr("height", h)
+
+    svg.selectAll("circle")
+      .data(dataset)
+      .enter()
+      .append("circle")
+      .attr("cx", (d) => { return xScale(d[0]) })
+      .attr("cy", (d) => { return yScale(d[1]) })
+      .attr("r", (d) => { return Math.sqrt(h - d[1]) }); // scaling the circle size by area. 
+
+    svg.selectAll("text")
+      .data(dataset)
+      .enter()
+      .append("text")
+      .text((d) => { return d[0] + "," + d[1] })
+      .attr("x", (d) => { return xScale(d[0]) })
+      .attr("y", (d) => { return yScale(d[1]) })
+      .attr("font-family", "sans-serif")
+      .attr("font-size", "11px")
+      .attr("fill", "red")
+
+  }
   render() {
     return (
       <div className="App">
-        {this.makeScatterPlot()}
+        {this.makeScatterPlotWithScales()}
       </div>
     );
   }
