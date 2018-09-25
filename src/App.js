@@ -357,6 +357,7 @@ class App extends Component {
   transitioningData = () => {
     var w = 600;
     var h = 250;
+    var padding = 30;
 
     var dataset = [5, 10, 13, 19, 21, 25, 22, 18, 15, 13,
       11, 12, 15, 20, 18, 17, 16, 18, 23, 25];
@@ -375,7 +376,10 @@ class App extends Component {
                 .attr('width', w)
                 .attr('height', h);
     
-    svg.selectAll('rect')
+    svg.append('g')
+      .attr('id', 'barchart')
+      .attr('clip-path', 'url(#chart-area)')
+      .selectAll('rect')
       .data(dataset)
       .enter()
       .append('rect')
@@ -397,6 +401,14 @@ class App extends Component {
         .attr("font-family", "sans-serif")
         .attr("font-size", "11px")
         .attr("fill", "white");
+    
+    svg.append('clipPath')
+        .attr('id', 'chart-area')
+        .append('rect')
+        .attr('x', padding)
+        .attr('y', padding)
+        .attr('width', w - padding * 3)
+        .attr('height', h - padding * 2)
     
     d3.select('body')
       .on('click', () => {
