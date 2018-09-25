@@ -392,11 +392,40 @@ class App extends Component {
         .enter()
         .append('text')
         .text((d) => { return d })
-        .attr('x', (d, i) => { return xScale(i) + xScale.bandwidth() / 2})
+        .attr('x', (d, i) => { return xScale(i) + (xScale.bandwidth() / 3) })
         .attr('y', (d) => { return h - yScale(d) + 14 })
         .attr("font-family", "sans-serif")
         .attr("font-size", "11px")
         .attr("fill", "white");
+    
+    d3.select('body')
+      .on('click', () => {
+        dataset = [11, 12, 15, 20, 18, 17, 16, 18, 23, 25,
+          5, 10, 13, 19, 21, 25, 22, 18, 15, 13];
+
+        console.log('in click');
+
+        // rebinds the updated data to all elemes
+        svg.selectAll('rect')
+            .data(dataset)
+            // update visuals
+            .transition() // adds the visual effect between old and new set
+            .duration(1000) // default is 1/4 section or 250 milliseconds.
+            .attr('y', (d) => { return h - yScale(d) })
+            .attr('height', (d) => { return yScale(d) })
+            .attr("fill", function (d) {
+              return "rgb(0, 0, " + Math.round(d * 10) + ")";
+            });
+        
+        svg.selectAll('text')
+          .data(dataset)
+          .transition() // adds the visual effect between old and new set
+          .duration(1000) // default is 1/4 section or 250 milliseconds.
+          .attr('x', (d, i) => { return xScale(i) + (xScale.bandwidth() / 3) })
+          .attr('y', (d) => { return h - yScale(d) + 14 })
+       })
+      
+       // transition should only be used on values that already exist. dont use on not-existing values as it will cause unpredictable behavior
   }
   render() {
     return (
