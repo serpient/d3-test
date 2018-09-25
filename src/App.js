@@ -308,6 +308,8 @@ class App extends Component {
       .domain([0, d3.max(dataset, (d) => { return d[1] })])
       .range([0, 10]);
 
+    var formatAsPercentage = d3.format(".1%"); // can be used with tickFormat to customize how the tick values are presented
+
     var xAxis = d3.axisBottom()
                   .scale(xScale)
                   // .tickValues([ 0, 100, 250, 600]) // manual ticks
