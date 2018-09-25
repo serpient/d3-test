@@ -410,7 +410,9 @@ class App extends Component {
             .data(dataset)
             // update visuals
             .transition() // adds the visual effect between old and new set
-            .duration(1000) // default is 1/4 section or 250 milliseconds.
+            .delay((d, i) => { return i * 100 }) // delays transition. can delay all transition, or one at a time like in so
+            .duration(500) // default is 1/4 section or 250 milliseconds. 
+            .ease(d3.easeCubicInOut) // transition type. defaults to easeCubicInOut, aka starts fast and goes slower. 
             .attr('y', (d) => { return h - yScale(d) })
             .attr('height', (d) => { return yScale(d) })
             .attr("fill", function (d) {
@@ -420,7 +422,8 @@ class App extends Component {
         svg.selectAll('text')
           .data(dataset)
           .transition() // adds the visual effect between old and new set
-          .duration(1000) // default is 1/4 section or 250 milliseconds.
+          .delay((d, i) => { return i * 100 }) // delays transition
+          .duration(500) // default is 1/4 section or 250 milliseconds.
           .attr('x', (d, i) => { return xScale(i) + (xScale.bandwidth() / 3) })
           .attr('y', (d) => { return h - yScale(d) + 14 })
        })
