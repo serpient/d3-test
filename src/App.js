@@ -202,12 +202,73 @@ class App extends Component {
                 .nice();
 
   `
+  }
+  TimeScales = () => {
+    let w = 600; // SVG width
+    let h = 300; // SVH height
+    var padding = 40;
+    let dataset;
+
+    var parseTime = d3.timeParse("%m/%d/%y");
+    // parseTime("02/20/17");  would return 2017-02-20T08:00:00.000Z 
+
+    var formatTime = d3.timeFormat("%b %e");
+
+    var rowConverter = (d) => { return { 
+      Date: parseTime(d.Date), 
+      Amount: parseInt(d.Amount) 
+    }};
+
+    // Loads data
+    d3.csv(require('./time_scale_data.csv'), rowConverter, (data) => {
+      dataset = data;
+
+      var xScale = d3.scaleTime()
+        .domain([
+          d3.min(dataset, (d) => { return d.Date; }),
+          d3.max(dataset, (d) => { return d.Date; }),
+        ])
+        .range([padding, w - padding]);
+
+      var yScale = d3.scaleLinear()
+        .domain([
+          d3.min(dataset, (d) => { return d.Amount; }),
+          d3.max(dataset, (d) => { return d.Amount; }),
+        ])
+        .range([h - padding, padding]);
+
+      var svg = d3.select('body')
+        .append('svg')
+        .attr('width', w)
+        .attr('height', h);
+
+      svg.selectAll('text')
+        .data(dataset)
+        .enter()
+        .append('text')
+        .text((d) => { return formatTime(d.Date) })
+        .attr("x", (d) => { return xScale(d.Date) + 4 })
+        .attr("y", (d) => { return yScale(d.Amount) + 4 })
+        .attr("font-family", "sans-serif")
+        .attr("font-size", "11px")
+        .attr("fill", "red");
+
+      svg.selectAll('circle')
+        .data(dataset)
+        .enter()
+        .append("circle")
+        .attr('cx', (d) => { return xScale(d.Date) })
+        .attr('cy', (d) => { return yScale(d.Amount) })
+        .attr('r', 2);
+    })
+
+    
 
   }
   render() {
     return (
       <div className="App">
-        {this.makeScatterPlotWithScales()}
+        {this.TimeScales()}
       </div>
     );
   }
