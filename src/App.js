@@ -400,24 +400,31 @@ class App extends Component {
     
     d3.select('body')
       .on('click', () => {
+
         dataset = [11, 12, 15, 20, 18, 17, 16, 18, 23, 25,
           5, 10, 13, 19, 21, 25, 22, 18, 15, 13];
-
-        console.log('in click');
 
         // rebinds the updated data to all elemes
         svg.selectAll('rect')
             .data(dataset)
             // update visuals
             .transition() // adds the visual effect between old and new set
-            .delay((d, i) => { return i * 100 }) // delays transition. can delay all transition, or one at a time like in so
+            .delay((d, i) => { return i / dataset.length * 1000 }) // delays transition. can delay all transition, or one at a time like in so
             .duration(500) // default is 1/4 section or 250 milliseconds. 
             .ease(d3.easeCubicInOut) // transition type. defaults to easeCubicInOut, aka starts fast and goes slower. 
+            // .on('start', function() { // start/end of transitions controls
+            //   d3.select(this)
+            //     .attr('fill', 'magenta')
+            // })
             .attr('y', (d) => { return h - yScale(d) })
             .attr('height', (d) => { return yScale(d) })
             .attr("fill", function (d) {
               return "rgb(0, 0, " + Math.round(d * 10) + ")";
-            });
+            })
+            // .on('end', function() {
+            //   d3.select(this)
+            //     .attr('fill', 'magenta')
+            // })
         
         svg.selectAll('text')
           .data(dataset)
