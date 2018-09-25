@@ -354,10 +354,55 @@ class App extends Component {
       .attr('transform', 'translate(' + padding + ',0)') // moves to the bottom
       .call(yAxis);
   }
+  transitioningData = () => {
+    var w = 600;
+    var h = 250;
+
+    var dataset = [5, 10, 13, 19, 21, 25, 22, 18, 15, 13,
+      11, 12, 15, 20, 18, 17, 16, 18, 23, 25];
+
+    var xScale = d3.scaleBand()
+                    .domain(d3.range(dataset.length)) // d3.range will generate an array of increasing numbers up to the value passed in. ex, [0,1,2,3,4,5..] etc
+                    .rangeRound([0, w])
+                    .paddingInner(0.05);
+
+    var yScale = d3.scaleLinear()
+                  .domain([0, d3.max(dataset)])
+                  .range([0, h]);
+
+    var svg = d3.select('body')
+                .append('svg')
+                .attr('width', w)
+                .attr('height', h);
+    
+    svg.selectAll('rect')
+      .data(dataset)
+      .enter()
+      .append('rect')
+      .attr('x', (d,i) => { return xScale(i) })
+      .attr('y', (d) => { return h - yScale(d) })
+      .attr('width', xScale.bandwidth())
+      .attr('height', (d) => { return yScale(d) })
+      .attr("fill", function (d) {
+        return "rgb(0, 0, " + Math.round(d * 10) + ")";
+      });
+    
+    svg.selectAll('text')
+        .data(dataset)
+        .enter()
+        .append('text')
+        .text((d) => { return d })
+        .attr('x', (d, i) => { return xScale(i) + xScale.bandwidth() / 2})
+        .attr('y', (d) => { return h - yScale(d) + 14 })
+        .attr("font-family", "sans-serif")
+        .attr("font-size", "11px")
+        .attr("fill", "white");
+  }
   render() {
     return (
       <div className="App">
-        {this.axis()}
+        <p>Click on this text to update the chart with new data values (once).</p>
+        {this.transitioningData()}
       </div>
     );
   }
