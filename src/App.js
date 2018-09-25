@@ -127,19 +127,24 @@ class App extends Component {
   makeScatterPlotWithScales = () => {
     let w = 500; // SVG width
     let h = 200; // SVH height
+    var padding = 20;
 
     var dataset = [
       [5, 20], [480, 90], [250, 50], [100, 33], [330, 95],
-      [410, 12], [475, 44], [25, 67], [85, 21], [220, 88]
+      [410, 12], [475, 44], [25, 67], [85, 21], [220, 88], [600, 150]
     ];
     
     var xScale = d3.scaleLinear()
                 .domain([0, d3.max(dataset, (d) => { return d[0] })]) // input
-                .range([w, 0]); // outputs
+                .range([padding, w - 20 * 2]); // outputs
 
     var yScale = d3.scaleLinear()
                     .domain([0, d3.max(dataset, (d) => { return d[1] })])
-                    .range([h, 0])
+                    .range([h - padding, padding])
+
+    var rScale = d3.scaleLinear()
+                    .domain([0, d3.max(dataset, (d) => { return d[1] }) ] )
+                    .range([2, 20])
 
     var svg = d3.select("body")
       .append("svg")
@@ -152,7 +157,7 @@ class App extends Component {
       .append("circle")
       .attr("cx", (d) => { return xScale(d[0]) })
       .attr("cy", (d) => { return yScale(d[1]) })
-      .attr("r", (d) => { return Math.sqrt(h - d[1]) }); // scaling the circle size by area. 
+      .attr("r", (d) => { return rScale(d[1]) }); // scaling the circle size by area. 
 
     svg.selectAll("text")
       .data(dataset)
