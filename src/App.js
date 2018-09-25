@@ -203,72 +203,159 @@ class App extends Component {
 
   `
   }
-  TimeScales = () => {
-    let w = 600; // SVG width
-    let h = 300; // SVH height
+  timeScales = () => {
+    //Width and height
+    var w = 500;
+    var h = 300;
     var padding = 40;
-    let dataset;
 
+    var dataset = [];
+    var xScale, yScale;  //Empty, for now
+
+    //For converting strings to Dates
     var parseTime = d3.timeParse("%m/%d/%y");
-    // parseTime("02/20/17");  would return 2017-02-20T08:00:00.000Z 
 
+    //For converting Dates to strings
     var formatTime = d3.timeFormat("%b %e");
 
-    var rowConverter = (d) => { return { 
-      Date: parseTime(d.Date), 
-      Amount: parseInt(d.Amount) 
-    }};
+    //Function for converting CSV values from strings to Dates and numbers
+    var rowConverter = function (d) {
+      return {
+        Date: parseTime(d.Date),
+        Amount: parseInt(d.Amount)
+      };
+    }
 
-    // Loads data
-    d3.csv(require('./time_scale_data.csv'), rowConverter, (data) => {
+    //Load in the data
+    d3.csv(require("./time_scale_data.csv"), rowConverter, function (data) {
+
+      //Copy data into global dataset
       dataset = data;
 
-      var xScale = d3.scaleTime()
+      //Create scale functions
+      xScale = d3.scaleTime()
         .domain([
-          d3.min(dataset, (d) => { return d.Date; }),
-          d3.max(dataset, (d) => { return d.Date; }),
+          d3.min(dataset, function (d) { return d.Date; }),
+          d3.max(dataset, function (d) { return d.Date; })
         ])
         .range([padding, w - padding]);
 
-      var yScale = d3.scaleLinear()
+      yScale = d3.scaleLinear()
         .domain([
-          d3.min(dataset, (d) => { return d.Amount; }),
-          d3.max(dataset, (d) => { return d.Amount; }),
+          d3.min(dataset, function (d) { return d.Amount; }),
+          d3.max(dataset, function (d) { return d.Amount; })
         ])
         .range([h - padding, padding]);
 
-      var svg = d3.select('body')
-        .append('svg')
-        .attr('width', w)
-        .attr('height', h);
+      //Create SVG element
+      var svg = d3.select("body")
+        .append("svg")
+        .attr("width", w)
+        .attr("height", h);
 
-      svg.selectAll('text')
+      //Generate date labels first, so they are in back
+      svg.selectAll("text")
         .data(dataset)
         .enter()
-        .append('text')
-        .text((d) => { return formatTime(d.Date) })
-        .attr("x", (d) => { return xScale(d.Date) + 4 })
-        .attr("y", (d) => { return yScale(d.Amount) + 4 })
+        .append("text")
+        .text(function (d) {
+          return formatTime(d.Date);
+        })
+        .attr("x", function (d) {
+          return xScale(d.Date) + 4;
+        })
+        .attr("y", function (d) {
+          return yScale(d.Amount) + 4;
+        })
         .attr("font-family", "sans-serif")
         .attr("font-size", "11px")
-        .attr("fill", "red");
+        .attr("fill", "#bbb");
 
-      svg.selectAll('circle')
+      //Generate circles last, so they appear in front
+      svg.selectAll("circle")
         .data(dataset)
         .enter()
         .append("circle")
-        .attr('cx', (d) => { return xScale(d.Date) })
-        .attr('cy', (d) => { return yScale(d.Amount) })
-        .attr('r', 2);
-    })
+        .attr("cx", function (d) {
+          return xScale(d.Date);
+        })
+        .attr("cy", function (d) {
+          return yScale(d.Amount);
+        })
+        .attr("r", 2);
+      
+    });
+  }
+  axis = () => {
+    let w = 600; // SVG width
+    let h = 300; // SVH height
+    var padding = 30;
 
+    var dataset = [
+      [5, 20], [480, 90], [250, 50], [100, 33], [330, 95],
+      [410, 12], [475, 44], [25, 67], [85, 21], [220, 88], [600, 150]
+    ];
+
+    var xScale = d3.scaleLinear()
+      .domain([0, d3.max(dataset, (d) => { return d[0] })]) // input
+      .range([padding, w - 20 * 2]); // outputs
+
+    var yScale = d3.scaleLinear()
+      .domain([0, d3.max(dataset, (d) => { return d[1] })])
+      .range([h - padding, padding])
+
+    var aScale = d3.scaleSqrt() // example usage of sqrt scale for area of rendered circles
+      .domain([0, d3.max(dataset, (d) => { return d[1] })])
+      .range([0, 10]);
+
+    var xAxis = d3.axisBottom()
+                  .scale(xScale)
+                  // .tickValues([ 0, 100, 250, 600]) // manual ticks
+                  .ticks(5); // suggested amount of ticks
+    
+    var yAxis = d3.axisLeft()
+                  .scale(yScale)
+                  .ticks(5);
     
 
+    var svg = d3.select("body")
+      .append("svg")
+      .attr("width", w)
+      .attr("height", h)
+
+    svg.selectAll("circle")
+      .data(dataset)
+      .enter()
+      .append("circle")
+      .attr("cx", (d) => { return xScale(d[0]) })
+      .attr("cy", (d) => { return yScale(d[1]) })
+      .attr("r", (d) => { return aScale(d[1]) }); // scaling the circle size by area. 
+
+    svg.selectAll("text")
+      .data(dataset)
+      .enter()
+      .append("text")
+      .text((d) => { return d[0] + "," + d[1] })
+      .attr("x", (d) => { return xScale(d[0]) })
+      .attr("y", (d) => { return yScale(d[1]) })
+      .attr("font-family", "sans-serif")
+      .attr("font-size", "11px")
+      .attr("fill", "red");
+  
+    svg.append("g")
+      .attr('class', 'axis')
+      .attr('transform', 'translate(0,' + (h - padding) + ')') // moves to the bottom
+      .call(xAxis);
+    
+    svg.append("g")
+      .attr('class', 'axis')
+      .attr('transform', 'translate(' + padding + ',0)') // moves to the bottom
+      .call(yAxis);
   }
   render() {
     return (
       <div className="App">
-        {this.TimeScales()}
+        {this.axis()}
       </div>
     );
   }

@@ -36,3 +36,16 @@
     background-color: teal;
     margin-right: 10px;
 }
+
+.axis path,
+.axis line {
+  stroke: teal;
+  shape-rendering: crispEdges;
+}
+
+.axis text {
+  font-family: Optima, Futura, sans-serif;
+  font-weight: bold;
+  font-size: 14px;
+  fill: teal;
+}
